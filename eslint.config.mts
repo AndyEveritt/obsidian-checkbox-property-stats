@@ -8,11 +8,13 @@ export default defineConfig(
 		'dist',
 		'esbuild.config.mjs',
 		'version-bump.mjs',
+		'scripts/setup-demo-vault.mjs',
 		'versions.json',
 		'main.js',
 		'package.json',
 		'package-lock.json',
 		'tsconfig.json',
+		'demo-vault',
 	]),
 	{
 		languageOptions: {

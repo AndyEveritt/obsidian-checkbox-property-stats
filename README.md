@@ -48,4 +48,15 @@ npm run build  # production build
 npm run lint
 ```
 
-To test manually, copy `main.js` and `manifest.json` to `<Vault>/.obsidian/plugins/checkbox-property-stats/`, reload Obsidian, and enable the plugin in **Settings → Community plugins**.
+### Demo vault
+
+```bash
+npm run demo   # create or reset demo-vault/
+npm run dev
+```
+
+`npm run demo` creates `demo-vault/` (gitignored) from the notes in `scripts/demo-notes/`, with the plugin enabled. The vault's plugin files are symlinks to the repo's `main.js` and `manifest.json`, so open the folder as a vault in Obsidian and reload the plugin after each rebuild. See `Welcome.md` in the vault for things to try.
+
+Run `npm run demo` again to reset the notes. It deletes and recreates everything in the vault except `.obsidian/`, so Obsidian's workspace and the plugin's settings are kept.
+
+To test in another vault, copy `main.js` and `manifest.json` to `<Vault>/.obsidian/plugins/checkbox-property-stats/`, reload Obsidian, and enable the plugin in **Settings → Community plugins**.
