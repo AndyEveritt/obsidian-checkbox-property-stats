@@ -22,12 +22,13 @@ export function parseStateNames(text: string): Map<string, string> {
 
 /**
  * Counts the checkboxes in a note by state. Named states are always present (with a
- * count of zero if unused) so queries can rely on them; any other state character is
- * used as its own key.
+ * count of zero if unused) so queries can rely on them. Any other state is counted
+ * under `unknownName`, or under its own character if `unknownName` is empty.
  */
 export function computeStats(
 	cache: CachedMetadata | null,
 	stateNames: Map<string, string>,
+	unknownName: string,
 ): CheckboxStats {
 	const states: Record<string, number> = {};
 	for (const name of stateNames.values()) {
@@ -37,7 +38,7 @@ export function computeStats(
 	let total = 0;
 	for (const item of cache?.listItems ?? []) {
 		if (item.task === undefined) continue;
-		const name = stateNames.get(item.task) ?? item.task;
+		const name = stateNames.get(item.task) ?? (unknownName || item.task);
 		states[name] = (states[name] ?? 0) + 1;
 		total++;
 	}

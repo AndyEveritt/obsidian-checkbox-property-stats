@@ -13,8 +13,10 @@ describe('parseStateNames', () => {
 	it('parses the default state names', () => {
 		expect([...names]).toEqual([
 			[' ', 'todo'],
+			['/', 'in-progress'],
 			['x', 'done'],
 			['X', 'done'],
+			['-', 'cancelled'],
 		]);
 	});
 
@@ -41,42 +43,56 @@ describe('parseStateNames', () => {
 
 describe('computeStats', () => {
 	it('counts checkboxes by state name', () => {
-		expect(computeStats(cache([' ', 'x', ' ', 'x', ' ']), names)).toEqual({
-			total: 5,
-			states: { todo: 3, done: 2 },
+		expect(computeStats(cache([' ', 'x', ' ', '/', 'x', '-', ' ']), names, 'unknown')).toEqual({
+			total: 7,
+			states: { todo: 3, 'in-progress': 1, done: 2, cancelled: 1 },
 		});
 	});
 
 	it('sums characters that share a name', () => {
-		expect(computeStats(cache(['x', 'X', 'X']), names)).toEqual({
+		expect(computeStats(cache(['x', 'X', 'X']), names, 'unknown')).toEqual({
 			total: 3,
-			states: { todo: 0, done: 3 },
+			states: { todo: 0, 'in-progress': 0, done: 3, cancelled: 0 },
 		});
 	});
 
-	it('uses the character itself for unnamed states', () => {
-		expect(computeStats(cache(['/', '-', '/', ' ']), names)).toEqual({
+	it('counts unnamed states under the unknown name', () => {
+		expect(computeStats(cache(['?', '>', '?', ' ']), names, 'unknown')).toEqual({
 			total: 4,
-			states: { todo: 1, done: 0, '/': 2, '-': 1 },
+			states: { todo: 1, 'in-progress': 0, done: 0, cancelled: 0, unknown: 3 },
+		});
+	});
+
+	it('uses the character itself for unnamed states when the unknown name is empty', () => {
+		expect(computeStats(cache(['?', '>', '?', ' ']), names, '')).toEqual({
+			total: 4,
+			states: { todo: 1, 'in-progress': 0, done: 0, cancelled: 0, '?': 2, '>': 1 },
+		});
+	});
+
+	it('merges unnamed states into a named state with the same name', () => {
+		expect(computeStats(cache(['?', ' ']), names, 'todo')).toEqual({
+			total: 2,
+			states: { todo: 2, 'in-progress': 0, done: 0, cancelled: 0 },
 		});
 	});
 
 	it('ignores list items that are not checkboxes', () => {
-		expect(computeStats(cache([undefined, 'x', undefined]), names)).toEqual({
+		expect(computeStats(cache([undefined, 'x', undefined]), names, 'unknown')).toEqual({
 			total: 1,
-			states: { todo: 0, done: 1 },
+			states: { todo: 0, 'in-progress': 0, done: 1, cancelled: 0 },
 		});
 	});
 
 	it('includes every named state with a zero count when there are no checkboxes', () => {
-		const empty = { total: 0, states: { todo: 0, done: 0 } };
-		expect(computeStats(null, names)).toEqual(empty);
-		expect(computeStats({}, names)).toEqual(empty);
-		expect(computeStats(cache([undefined]), names)).toEqual(empty);
+		const empty = { total: 0, states: { todo: 0, 'in-progress': 0, done: 0, cancelled: 0 } };
+		expect(computeStats(null, names, 'unknown')).toEqual(empty);
+		expect(computeStats({}, names, 'unknown')).toEqual(empty);
+		expect(computeStats(cache([undefined]), names, 'unknown')).toEqual(empty);
 	});
 
 	it('uses raw characters for everything when no names are configured', () => {
-		expect(computeStats(cache([' ', 'x']), new Map())).toEqual({
+		expect(computeStats(cache([' ', 'x']), new Map(), '')).toEqual({
 			total: 2,
 			states: { ' ': 1, x: 1 },
 		});

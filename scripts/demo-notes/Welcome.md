@@ -16,7 +16,7 @@ This vault is for manually testing the plugin. This note has no checkboxes, so t
 ## Things to try
 
 - Open [[Shopping list]], tick a checkbox, and watch the `checkboxes` property update.
-- Add and delete checkboxes in [[Project plan]]. It uses custom states (`[/]`, `[-]`) and uppercase `[X]`.
+- Add and delete checkboxes in [[Project plan]]. It uses in-progress `[/]`, cancelled `[-]`, uppercase `[X]` and `[?]`, which isn't a named state so it's counted as `unknown`.
 - Check that the checkboxes inside code blocks in [[Edge cases]] aren't counted.
 - Open [[Stale stats]] and run **Update checkbox stats in current note** from the command palette. The wrong counts should be corrected.
 - Delete every checkbox in [[Shopping list]]. The total should drop to `0`, or the property should be removed if **Remove property when empty** is on.

@@ -30,6 +30,11 @@ async function expectStats(path: string, expected: unknown, name = 'checkboxes')
 	await expect.poll(() => property(path, name)).toEqual(expected);
 }
 
+/** Stats under the default state names, which are always present even when unused. */
+function withDefaults(total: number, counts: Record<string, number> = {}) {
+	return { total, states: { todo: 0, 'in-progress': 0, done: 0, cancelled: 0, ...counts } };
+}
+
 const removeFolder = () =>
 	evaluate(
 		`app.vault.adapter.exists("${FOLDER}").then((exists) => exists && app.vault.adapter.rmdir("${FOLDER}", true))`,
@@ -74,14 +79,14 @@ describe('when a note changes', () => {
 		const path = await createNote('Nothing to do yet.\n');
 		await obsidian('append', { path, content: '- [ ] First task' });
 
-		await expectStats(path, { total: 1, states: { todo: 1, done: 0 } });
+		await expectStats(path, withDefaults(1, { todo: 1 }));
 	});
 
 	it('keeps existing properties and content', async () => {
 		const body = '- [ ] One\n- [x] Two\n';
 		const path = await createNote(`---\nstatus: active\ntags:\n  - demo\n---\n${body}`);
 
-		await expectStats(path, { total: 2, states: { todo: 1, done: 1 } });
+		await expectStats(path, withDefaults(2, { todo: 1, done: 1 }));
 		expect(await readNote(path)).toBe(
 			[
 				'---',
@@ -92,7 +97,9 @@ describe('when a note changes', () => {
 				'  total: 2',
 				'  states:',
 				'    todo: 1',
+				'    in-progress: 0',
 				'    done: 1',
+				'    cancelled: 0',
 				'---',
 				body.trimEnd(),
 			].join('\n'),
@@ -101,13 +108,13 @@ describe('when a note changes', () => {
 
 	it('updates when a checkbox is ticked or given another state', async () => {
 		const path = await createNote('- [ ] One\n- [ ] Two\n');
-		await expectStats(path, { total: 2, states: { todo: 2, done: 0 } });
+		await expectStats(path, withDefaults(2, { todo: 2 }));
 
-		// The property added 7 lines of frontmatter above the tasks.
-		await obsidian('task', { path, line: 8 }, ['toggle']);
-		await obsidian('task', { path, line: 9, status: '/' });
+		// The property added 9 lines of frontmatter above the tasks.
+		await obsidian('task', { path, line: 10 }, ['toggle']);
+		await obsidian('task', { path, line: 11, status: '/' });
 
-		await expectStats(path, { total: 2, states: { todo: 0, done: 1, '/': 1 } });
+		await expectStats(path, withDefaults(2, { 'in-progress': 1, done: 1 }));
 	});
 
 	it('counts nested, numbered and callout checkboxes but not code blocks', async () => {
@@ -128,7 +135,7 @@ describe('when a note changes', () => {
 			].join('\n'),
 		);
 
-		await expectStats(path, { total: 5, states: { todo: 2, done: 2, '-': 1 } });
+		await expectStats(path, withDefaults(5, { todo: 2, done: 2, cancelled: 1 }));
 	});
 
 	it('corrects stale stats', async () => {
@@ -136,12 +143,12 @@ describe('when a note changes', () => {
 			'---\ncheckboxes:\n  total: 10\n  states:\n    todo: 7\n    done: 3\n---\n- [ ] One\n',
 		);
 
-		await expectStats(path, { total: 1, states: { todo: 1, done: 0 } });
+		await expectStats(path, withDefaults(1, { todo: 1 }));
 	});
 
 	it('does not rewrite a note whose stats are up to date', async () => {
 		const path = await createNote('- [ ] One\n');
-		await expectStats(path, { total: 1, states: { todo: 1, done: 0 } });
+		await expectStats(path, withDefaults(1, { todo: 1 }));
 		await sleep(SETTLE_MS);
 		const before = await modifiedTime(path);
 
@@ -152,16 +159,16 @@ describe('when a note changes', () => {
 	describe('when the last checkbox is removed', () => {
 		it('sets the total to zero', async () => {
 			const path = await createNote('- [ ] One\n- [x] Two\n');
-			await expectStats(path, { total: 2, states: { todo: 1, done: 1 } });
+			await expectStats(path, withDefaults(2, { todo: 1, done: 1 }));
 
 			await writeNote(path, (await readNote(path)).replace(/^- \[.\] .*$/gm, ''));
-			await expectStats(path, { total: 0, states: { todo: 0, done: 0 } });
+			await expectStats(path, withDefaults(0));
 		});
 
 		it('removes the property when "Remove property when empty" is on', async () => {
 			await setSettings({ removeWhenEmpty: true });
 			const path = await createNote('---\nstatus: active\n---\n- [ ] One\n');
-			await expectStats(path, { total: 1, states: { todo: 1, done: 0 } });
+			await expectStats(path, withDefaults(1, { todo: 1 }));
 
 			await writeNote(path, (await readNote(path)).replace('- [ ] One', ''));
 			await expectStats(path, null);
@@ -175,7 +182,7 @@ describe('settings', () => {
 		await setSettings({ propertyName: 'tasks' });
 		const path = await createNote('- [x] One\n');
 
-		await expectStats(path, { total: 1, states: { todo: 0, done: 1 } }, 'tasks');
+		await expectStats(path, withDefaults(1, { done: 1 }), 'tasks');
 		expect(await property(path)).toBeNull();
 	});
 
@@ -183,7 +190,21 @@ describe('settings', () => {
 		await setSettings({ stateNames: '[ ] open\n[x] closed\n[/] closed' });
 		const path = await createNote('- [ ] One\n- [x] Two\n- [/] Three\n- [?] Four\n');
 
-		await expectStats(path, { total: 4, states: { open: 1, closed: 2, '?': 1 } });
+		await expectStats(path, { total: 4, states: { open: 1, closed: 2, unknown: 1 } });
+	});
+
+	it('uses the configured unknown state name', async () => {
+		await setSettings({ unknownStateName: 'other' });
+		const path = await createNote('- [x] One\n- [?] Two\n- [>] Three\n');
+
+		await expectStats(path, withDefaults(3, { done: 1, other: 2 }));
+	});
+
+	it('uses the state character when the unknown state name is empty', async () => {
+		await setSettings({ unknownStateName: ' ' });
+		const path = await createNote('- [x] One\n- [?] Two\n- [>] Three\n');
+
+		await expectStats(path, withDefaults(3, { done: 1, '?': 1, '>': 1 }));
 	});
 });
 
@@ -193,7 +214,7 @@ describe('commands', () => {
 	/** Creates an up-to-date note, then renames the states without changing the note. */
 	async function createNoteWithStaleNames(): Promise<string> {
 		const path = await createNote('- [x] One\n');
-		await expectStats(path, { total: 1, states: { todo: 0, done: 1 } });
+		await expectStats(path, withDefaults(1, { done: 1 }));
 		return path;
 	}
 
@@ -206,7 +227,7 @@ describe('commands', () => {
 		await runCommand('update-current-note');
 
 		await expectStats(current, renamed);
-		expect(await property(other)).toEqual({ total: 1, states: { todo: 0, done: 1 } });
+		expect(await property(other)).toEqual(withDefaults(1, { done: 1 }));
 	});
 
 	it('updates all notes and reports how many changed', async () => {

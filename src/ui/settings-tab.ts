@@ -19,13 +19,23 @@ export class CheckboxStatsSettingTab extends PluginSettingTab {
 			},
 			{
 				name: 'State names',
-				desc: 'One per line, such as "[/] in progress". Characters that map to the same name are counted together. Unlisted states use the character itself.',
+				desc: 'One per line, such as "[>] deferred". Characters that map to the same name are counted together.',
 				control: {
 					type: 'textarea',
 					key: 'stateNames',
 					defaultValue: DEFAULT_SETTINGS.stateNames,
 					placeholder: DEFAULT_SETTINGS.stateNames,
 					rows: 6,
+				},
+			},
+			{
+				name: 'Unknown state name',
+				desc: 'States not listed above are counted under this name. Leave empty to use the state character instead.',
+				control: {
+					type: 'text',
+					key: 'unknownStateName',
+					defaultValue: DEFAULT_SETTINGS.unknownStateName,
+					placeholder: DEFAULT_SETTINGS.unknownStateName,
 				},
 			},
 			{

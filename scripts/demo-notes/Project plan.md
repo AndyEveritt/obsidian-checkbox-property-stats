@@ -3,7 +3,7 @@ status: active
 due: 2026-10-31
 ---
 
-Existing properties should be kept when the stats are added. Expected counts: 12 total, with todo 5, done 3, `/` 2, `-` 1 and `?` 1.
+Existing properties should be kept when the stats are added. Expected counts: 12 total, with todo 5, in-progress 2, done 3, cancelled 1 and unknown 1.
 
 ## Research
 

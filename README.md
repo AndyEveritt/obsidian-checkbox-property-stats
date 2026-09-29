@@ -7,17 +7,20 @@ Whenever a checkbox is added, removed, or toggled, the note's frontmatter is upd
 ```markdown
 ---
 checkboxes:
-  total: 4
+  total: 5
   states:
     todo: 2
+    in-progress: 1
     done: 1
-    /: 1
+    cancelled: 0
+    unknown: 1
 ---
 
 - [ ] Write the draft
 - [ ] Review it
 - [x] Pick a topic
 - [/] Gather sources
+- [?] Ask about the deadline
 ```
 
 Checkboxes at any nesting level are counted. Checkboxes inside code blocks are ignored.
@@ -31,7 +34,8 @@ Checkboxes at any nesting level are counted. Checkboxes inside code blocks are i
 ## Settings
 
 - **Property name**: the frontmatter property to write to. Defaults to `checkboxes`.
-- **State names**: maps state characters to names, one per line, e.g. `[x] done`. Several characters can share a name (by default `[x]` and `[X]` both count as `done`). Named states always appear in the property, with `0` if unused. Any other state character is used as its own key.
+- **State names**: maps state characters to names, one per line, e.g. `[x] done`. The defaults are `[ ] todo`, `[/] in-progress`, `[x] done`, `[X] done` and `[-] cancelled`. Several characters can share a name (by default `[x]` and `[X]` both count as `done`). Named states always appear in the property, with `0` if unused.
+- **Unknown state name**: the name that states not listed in **State names** are counted under. Defaults to `unknown`, and only appears in the property when used. Leave empty to use each state character as its own key.
 - **Remove property when empty**: see above.
 
 ## Commands

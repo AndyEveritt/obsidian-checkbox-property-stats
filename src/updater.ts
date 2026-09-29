@@ -49,7 +49,11 @@ export class CheckboxStatsUpdater {
 		const propertyName =
 			settings.propertyName.trim() || DEFAULT_SETTINGS.propertyName;
 		const cache = this.app.metadataCache.getFileCache(file);
-		const stats = computeStats(cache, parseStateNames(stateNames));
+		const stats = computeStats(
+			cache,
+			parseStateNames(stateNames),
+			settings.unknownStateName.trim(),
+		);
 		const existing: unknown = cache?.frontmatter?.[propertyName];
 
 		if (stats.total === 0) {
