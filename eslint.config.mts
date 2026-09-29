@@ -31,4 +31,12 @@ export default defineConfig(
 		},
 	},
 	...obsidianmd.configs.recommended,
+	{
+		// Tests run in Node and never ship in the plugin.
+		files: ['tests/**/*.ts', 'e2e/**/*.ts', 'vitest.e2e.config.ts'],
+		rules: {
+			'obsidianmd/no-global-this': 'off',
+			'obsidianmd/no-nodejs-modules': 'off',
+		},
+	},
 );

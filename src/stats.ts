@@ -1,4 +1,4 @@
-import { CachedMetadata } from 'obsidian';
+import type { CachedMetadata } from 'obsidian';
 
 export interface CheckboxStats {
 	total: number;

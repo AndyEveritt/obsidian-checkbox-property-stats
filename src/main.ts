@@ -1,10 +1,7 @@
 import { Plugin } from 'obsidian';
 import { registerCommands } from './commands';
-import {
-	CheckboxStatsSettings,
-	CheckboxStatsSettingTab,
-	DEFAULT_SETTINGS,
-} from './settings';
+import { CheckboxStatsSettings, DEFAULT_SETTINGS } from './settings';
+import { CheckboxStatsSettingTab } from './ui/settings-tab';
 import { CheckboxStatsUpdater } from './updater';
 
 export default class CheckboxPropertyStatsPlugin extends Plugin {

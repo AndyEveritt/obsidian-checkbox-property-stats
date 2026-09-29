@@ -46,7 +46,20 @@ npm install
 npm run dev    # watch
 npm run build  # production build
 npm run lint
+npm test       # unit tests
+npm run test:e2e
 ```
+
+### Tests
+
+`npm test` runs unit tests for the counting logic in `src/stats.ts`. They run in CI.
+
+`npm run test:e2e` builds the plugin and tests it inside Obsidian using the [Obsidian CLI](https://obsidian.md/help/cli). It creates notes, edits checkboxes and runs the plugin's commands, then checks the property Obsidian ends up with. Before running it:
+
+1. Turn on **Settings → General → Command line interface** in Obsidian, and make sure `obsidian` is on your `PATH`. Set `OBSIDIAN_CLI` to use a different path.
+2. Run `npm run demo` and open `demo-vault` in Obsidian.
+
+The tests refuse to run unless the CLI is connected to the demo vault. They work in a temporary `e2e-tests/` folder, which is deleted afterwards, and reload the plugin at the end to restore its saved settings. The **Update checkbox stats in all notes** test also updates the demo notes, so those may end up with their stats corrected.
 
 ### Demo vault
 
