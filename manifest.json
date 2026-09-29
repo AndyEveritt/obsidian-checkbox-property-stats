@@ -1,7 +1,7 @@
 {
 	"id": "checkbox-property-stats",
 	"name": "Checkbox Property Stats",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"minAppVersion": "1.13.0",
 	"description": "Keep a note property up to date with how many checkboxes the note has in each state.",
 	"author": "Andy Everitt",
