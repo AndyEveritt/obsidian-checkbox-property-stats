@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-checkbox-property-stats",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "Obsidian plugin that keeps a frontmatter property up to date with checkbox counts by state",
 	"main": "main.js",
 	"type": "module",
