@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "checkbox-property-stats",
+	"name": "Checkbox Property Stats",
 	"version": "1.0.0",
-	"minAppVersion": "1.0.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"minAppVersion": "1.13.0",
+	"description": "Keep a note property up to date with how many checkboxes the note has in each state.",
+	"author": "Andy Everitt",
+	"authorUrl": "https://github.com/AndyEveritt",
 	"isDesktopOnly": false
 }

@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-checkbox-property-stats",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Obsidian plugin that keeps a frontmatter property up to date with checkbox counts by state",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
@@ -20,7 +20,7 @@
 		"eslint-plugin-obsidianmd": "^0.4.0",
 		"globals": "^17.6.0",
 		"jiti": "^2.6.1",
-		"obsidian": "latest",
+		"obsidian": "^1.13.1",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1"
 	}
